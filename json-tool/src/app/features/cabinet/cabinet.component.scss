@@ -1,0 +1,52 @@
+.cabinet-container {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.cabinet-toolbar {
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+  padding: 1rem 2rem;
+}
+
+.toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-email {
+  margin-right: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.cabinet-content {
+  padding: 2rem;
+}
+
+.card-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+
+  h3 {
+    margin: 0;
+    color: #333;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+
+  p {
+    margin: 1rem 0;
+    color: #666;
+  }
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}

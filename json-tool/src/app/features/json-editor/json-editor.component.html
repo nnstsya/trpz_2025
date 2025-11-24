@@ -1,0 +1,143 @@
+<div class="json-tool-app">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <p-toolbar class="main-toolbar">
+    <div class="p-toolbar-group-start">
+      <i class="pi pi-code" style="font-size: 1.5rem; margin-right: 0.5rem; color: #667eea;"></i>
+      <span class="toolbar-title">JSON Tool</span>
+    </div>
+
+    <div class="p-toolbar-group-end">
+      <p-button
+        *ngIf="isAuthenticated"
+        icon="pi pi-cloud-upload"
+        (onClick)="saveToFirebase()"
+        severity="success"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="Save to Cloud"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
+        *ngIf="isAuthenticated"
+        icon="pi pi-briefcase"
+        (onClick)="goToCabinet()"
+        severity="info"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="My Schemas"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
+        icon="pi pi-chevron-left"
+        [disabled]="!canUndo()"
+        (onClick)="undo()"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="Undo (Ctrl+Z)"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
+        icon="pi pi-chevron-right"
+        [disabled]="!canRedo()"
+        (onClick)="redo()"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="Redo (Ctrl+Y)"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
+        [icon]="viewMode === 'flat' ? 'pi pi-sitemap' : 'pi pi-list'"
+        (onClick)="toggleViewMode()"
+        severity="info"
+        [text]="true"
+        [rounded]="true"
+        [pTooltip]="viewMode === 'flat' ? 'Switch to Edit View' : 'Switch to Flat View'"
+        tooltipPosition="bottom">
+      </p-button>
+      <p-button
+        *ngIf="isAuthenticated"
+        icon="pi pi-sign-out"
+        (onClick)="signOut()"
+        severity="danger"
+        [text]="true"
+        [rounded]="true"
+        pTooltip="Sign Out"
+        tooltipPosition="bottom">
+      </p-button>
+    </div>
+  </p-toolbar>
+
+  <p-splitter [panelSizes]="[50, 50]" styleClass="main-splitter">
+    <ng-template pTemplate>
+      <div class="panel-content">
+        <app-json-text-editor
+          [jsonText]="jsonText"
+          [validationResult]="validationResult"
+          [jsonErrors]="jsonErrors"
+          [jsonComplete]="jsonComplete"
+          [cursorLine]="cursorLine"
+          [cursorColumn]="cursorColumn"
+          (jsonTextChange)="onJsonTextChange($event)"
+          (cursorPositionChange)="onCursorPositionChange($event)"
+          (minifyRequest)="minifyJson()"
+          (prettifyRequest)="prettifyJson()"
+          (sortKeysRequest)="sortJsonKeys()"
+          (validateRequest)="validateJson()"
+          (generateSchemaRequest)="generateSchemaFromJson()"
+          (exportJsonTextRequest)="exportJsonText()">
+        </app-json-text-editor>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate>
+      <div class="panel-content">
+        <app-schema-editor
+          [schema]="schema"
+          [viewMode]="viewMode"
+          [treeData]="treeData"
+          [selectedExportFormat]="selectedExportFormat"
+          [exportFormats]="exportFormats"
+          (schemaChange)="onPropertyChange()"
+          (propertyAdd)="addProperty()"
+          (propertyRemove)="removeProperty($event)"
+          (propertyFocus)="onPropertyFocus()"
+          (propertyBlur)="onPropertyBlur()"
+          (importRequest)="importSchema($event)"
+          (exportRequest)="exportSchema()"
+          (exportFormatChange)="onExportFormatChange($event)"
+          (expandAllRequest)="expandAll()"
+          (collapseAllRequest)="collapseAll()">
+        </app-schema-editor>
+      </div>
+    </ng-template>
+  </p-splitter>
+
+  <div class="status-bar">
+    <div class="status-item">
+      <i class="pi pi-circle-fill status-icon" [class.status-saved]="autoSaveStatus === 'Saved'" [class.status-saving]="autoSaveStatus === 'Saving...'"></i>
+      <span>{{ autoSaveStatus }}</span>
+    </div>
+    <div class="status-item">
+      <i class="pi" [ngClass]="jsonComplete ? 'pi-check-circle' : 'pi-exclamation-triangle'"
+         [style.color]="jsonComplete ? '#22c55e' : '#f59e0b'"></i>
+      <span>{{ jsonComplete ? 'Complete' : 'Incomplete' }}</span>
+    </div>
+    <div class="status-item" *ngIf="validationResult">
+      <i class="pi" [ngClass]="validationResult.valid ? 'pi-check-circle' : 'pi-times-circle'"
+         [style.color]="validationResult.valid ? '#22c55e' : '#ef4444'"></i>
+      <span>{{ validationResult.valid ? 'Valid' : validationResult.errors.length + ' Error(s)' }}</span>
+    </div>
+    <div class="status-item">
+      <i class="pi pi-align-left"></i>
+      <span>Ln {{ cursorLine }}, Col {{ cursorColumn }}</span>
+    </div>
+    <div class="status-item">
+      <i class="pi pi-database"></i>
+      <span>{{ schema.properties.length }} Properties</span>
+    </div>
+  </div>
+</div>

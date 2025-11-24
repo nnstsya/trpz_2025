@@ -1,0 +1,234 @@
+<p-card header="Schema Editor" styleClass="schema-card">
+  <ng-template pTemplate="header">
+    <div class="card-header-content">
+      <div class="header-left">
+        <i class="pi pi-database"></i>
+        <span>Schema Editor</span>
+        <p-chip
+          *ngIf="schema.properties.length > 0"
+          [label]="schema.properties.length + ' properties'"
+          styleClass="property-count-chip">
+        </p-chip>
+      </div>
+      <div class="header-actions">
+        <p-button
+          icon="pi pi-plus"
+          label="Add Property"
+          (onClick)="addProperty()"
+          pTooltip="Add new property"
+          tooltipPosition="bottom"
+        >
+        </p-button>
+        <p-fileupload
+          #fileUpload
+          name="demo[]"
+          mode="basic"
+          accept=".json"
+          chooseIcon="pi pi-upload"
+          [maxFileSize]="10000000"
+          [auto]="true"
+          [customUpload]="true"
+          (onSelect)="importSchema($event)"
+          [chooseLabel]="'Import'">
+        </p-fileupload>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="schema-filters" *ngIf="viewMode === 'flat'">
+    <span class="p-input-icon-left">
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search properties..."
+        style="width: 100%; max-width: 300px;">
+      <i class="pi pi-search"></i>
+    </span>
+  </div>
+
+  <div class="schema-table-container" *ngIf="viewMode === 'flat'">
+    <p-table
+      [value]="filteredProperties"
+      [scrollable]="true"
+      scrollHeight="40vh"
+      [tableStyle]="{'min-width': '50rem'}"
+      styleClass="schema-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 20%; cursor: pointer;" (click)="sortBy('name')">
+            Name
+            <i class="pi" [ngClass]="sortField === 'name' ? (sortOrder === 1 ? 'pi-sort-up' : 'pi-sort-down') : 'pi-sort'"></i>
+          </th>
+          <th style="width: 25%; cursor: pointer;" (click)="sortBy('description')">
+            Description
+            <i class="pi" [ngClass]="sortField === 'description' ? (sortOrder === 1 ? 'pi-sort-up' : 'pi-sort-down') : 'pi-sort'"></i>
+          </th>
+          <th style="width: 15%; cursor: pointer;" (click)="sortBy('dataType')">
+            Type
+            <i class="pi" [ngClass]="sortField === 'dataType' ? (sortOrder === 1 ? 'pi-sort-up' : 'pi-sort-down') : 'pi-sort'"></i>
+          </th>
+          <th style="width: 15%">Format</th>
+          <th style="width: 20%">Example</th>
+          <th style="width: 5%">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-property>
+        <tr>
+          <td>
+            <input
+              pInputText
+              [(ngModel)]="property.name"
+              (focus)="onPropertyFocus()"
+              (ngModelChange)="onPropertyChange()"
+              (blur)="onPropertyBlur()"
+              class="table-input">
+          </td>
+          <td>
+            <input
+              pInputText
+              [(ngModel)]="property.description"
+              (focus)="onPropertyFocus()"
+              (ngModelChange)="onPropertyChange()"
+              (blur)="onPropertyBlur()"
+              class="table-input">
+          </td>
+          <td>
+            <p-dropdown
+              appendTo="body"
+              [options]="dataTypes"
+              [(ngModel)]="property.dataType"
+              (onFocus)="onPropertyFocus()"
+              (ngModelChange)="onPropertyChange()"
+              (onBlur)="onPropertyBlur()"
+              optionLabel="label"
+              optionValue="value"
+              [style]="{'width': '100%'}">
+            </p-dropdown>
+          </td>
+          <td>
+            <p-dropdown
+              appendTo="body"
+              [options]="formatTypes"
+              [(ngModel)]="property.format"
+              (onFocus)="onPropertyFocus()"
+              (ngModelChange)="onPropertyChange()"
+              (onBlur)="onPropertyBlur()"
+              optionLabel="label"
+              optionValue="value"
+              [style]="{'width': '100%'}">
+            </p-dropdown>
+          </td>
+          <td>
+            <input
+              pInputText
+              [(ngModel)]="property.example"
+              (focus)="onPropertyFocus()"
+              (ngModelChange)="onPropertyChange()"
+              (blur)="onPropertyBlur()"
+              class="table-input">
+          </td>
+          <td>
+            <p-button
+              icon="pi pi-trash"
+              (onClick)="removeProperty(property)"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              pTooltip="Delete property"
+              tooltipPosition="left">
+            </p-button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="empty-state">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No schema properties defined</p>
+            <p-button
+              icon="pi pi-plus"
+              label="Add Your First Property"
+              (onClick)="addProperty()"
+              size="small">
+            </p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="tree-controls" *ngIf="viewMode === 'edit'">
+    <p-button
+      icon="pi pi-plus"
+      label="Expand All"
+      (onClick)="expandAll()"
+      size="small"
+      [outlined]="true"
+      styleClass="mr-2">
+    </p-button>
+    <p-button
+      icon="pi pi-minus"
+      label="Collapse All"
+      (onClick)="collapseAll()"
+      size="small"
+      [outlined]="true">
+    </p-button>
+  </div>
+
+  <div class="schema-tree-container" *ngIf="viewMode === 'edit'">
+    <p-treeTable
+      [value]="treeData"
+      [scrollable]="true"
+      scrollHeight="40vh"
+      [tableStyle]="{'min-width': '50rem'}"
+      styleClass="tree-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Type</th>
+          <th>Format</th>
+          <th>Example</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+        <tr>
+          <td>{{ rowData.name }}</td>
+          <td>{{ rowData.description }}</td>
+          <td>{{ rowData.dataType }}</td>
+          <td>{{ rowData.format }}</td>
+          <td>{{ rowData.example }}</td>
+        </tr>
+      </ng-template>
+    </p-treeTable>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="card-footer-content">
+      <div class="export-controls">
+        <span class="export-label">Export Schema:</span>
+        <p-dropdown
+          appendTo="body"
+          [options]="exportFormats"
+          [(ngModel)]="selectedExportFormat"
+          (ngModelChange)="onExportFormatChange()"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{'width': '150px'}">
+        </p-dropdown>
+        <p-button
+          icon="pi pi-download"
+          label="Export"
+          (onClick)="exportSchema()"
+          severity="success"
+          size="small"
+          pTooltip="Export schema to selected format"
+          tooltipPosition="bottom">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-card>

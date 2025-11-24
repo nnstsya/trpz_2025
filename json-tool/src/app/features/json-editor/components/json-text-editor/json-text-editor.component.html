@@ -1,0 +1,123 @@
+<p-card header="JSON Editor" styleClass="editor-card">
+  <ng-template pTemplate="header">
+    <div class="card-header-content">
+      <div class="header-left">
+        <i class="pi pi-file-edit"></i>
+        <span>JSON Editor</span>
+      </div>
+      <div class="header-actions">
+        <p-button
+          icon="pi pi-arrow-down-left-and-arrow-up-right-to-center"
+          label="Minify"
+          (onClick)="minify()"
+          size="small"
+          [outlined]="true"
+          pTooltip="Minify JSON"
+          tooltipPosition="bottom">
+        </p-button>
+        <p-button
+          icon="pi pi-code"
+          label="Prettify"
+          (onClick)="prettify()"
+          size="small"
+          [outlined]="true"
+          pTooltip="Format JSON with indentation"
+          tooltipPosition="bottom">
+        </p-button>
+        <p-button
+          icon="pi pi-sort-alpha-down"
+          label="Sort Keys"
+          (onClick)="sortKeys()"
+          size="small"
+          [outlined]="true"
+          pTooltip="Sort JSON keys alphabetically"
+          tooltipPosition="bottom">
+        </p-button>
+        <p-button
+          icon="pi pi-sparkles"
+          label="Generate Schema"
+          (onClick)="generateSchema()"
+          size="small"
+          severity="help"
+          [outlined]="true"
+          pTooltip="Auto-generate schema from JSON"
+          tooltipPosition="bottom">
+        </p-button>
+        <p-button
+          icon="pi pi-check-circle"
+          label="Validate"
+          (onClick)="validate()"
+          size="small"
+          severity="success"
+          pTooltip="Validate against schema"
+          tooltipPosition="bottom">
+        </p-button>
+        <p-button
+          icon="pi pi-download"
+          label="Export JSON"
+          (onClick)="exportJsonText()"
+          size="small"
+          severity="info"
+          [outlined]="true"
+          pTooltip="Export JSON to file"
+          tooltipPosition="bottom">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="json-editor-wrapper">
+    <div class="line-numbers">
+      <div
+        *ngFor="let line of jsonText.split('\n'); let i = index"
+        class="line-number"
+        [class.error-line]="getLineErrors(i + 1)"
+        [pTooltip]="getLineErrors(i + 1)"
+        [tooltipPosition]="'right'"
+        [escape]="false">
+        {{ i + 1 }}
+      </div>
+    </div>
+    <div class="editor-container">
+      <div
+        class="syntax-highlight"
+        [innerHTML]="getHighlightedJson()"
+        aria-hidden="true">
+      </div>
+      <textarea
+        pInputTextarea
+        [(ngModel)]="jsonText"
+        (ngModelChange)="onTextChange()"
+        (click)="updateCursorPosition($event)"
+        (keyup)="updateCursorPosition($event)"
+        (keydown)="handleAutoClose($event)"
+        [rows]="20"
+        class="json-editor"
+        placeholder="Enter your JSON here..."
+        [autoResize]="false"
+        spellcheck="false">
+      </textarea>
+    </div>
+  </div>
+
+  <div class="validation-messages" *ngIf="validationResult">
+    <p-message
+      *ngIf="validationResult.valid"
+      severity="success"
+      [text]="'JSON is valid according to schema'">
+    </p-message>
+
+    <div *ngIf="!validationResult.valid">
+      <p-message
+        severity="error"
+        [text]="'Found ' + validationResult.errors.length + ' validation error(s)'">
+      </p-message>
+      <div class="error-list">
+        <div *ngFor="let error of validationResult.errors" class="error-item">
+          <p-message severity="warn" [text]="error.path + ': ' + error.message">
+          </p-message>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-card>
