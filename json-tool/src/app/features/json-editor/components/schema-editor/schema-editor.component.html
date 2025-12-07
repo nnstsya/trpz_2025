@@ -160,24 +160,6 @@
     </p-table>
   </div>
 
-  <div class="tree-controls" *ngIf="viewMode === 'edit'">
-    <p-button
-      icon="pi pi-plus"
-      label="Expand All"
-      (onClick)="expandAll()"
-      size="small"
-      [outlined]="true"
-      styleClass="mr-2">
-    </p-button>
-    <p-button
-      icon="pi pi-minus"
-      label="Collapse All"
-      (onClick)="collapseAll()"
-      size="small"
-      [outlined]="true">
-    </p-button>
-  </div>
-
   <div class="schema-tree-container" *ngIf="viewMode === 'edit'">
     <p-treeTable
       [value]="treeData"

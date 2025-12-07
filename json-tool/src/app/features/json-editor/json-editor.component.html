@@ -2,21 +2,45 @@
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
+  <p-dialog
+    header="Save As"
+    [(visible)]="showNameDialog"
+    [modal]="true"
+    [style]="{ width: '400px' }"
+    [closable]="true"
+    (onHide)="cancelSaveDialog()">
+    <div class="dialog-content">
+      <label for="schemaName">Name</label>
+      <input
+        id="schemaName"
+        type="text"
+        pInputText
+        [(ngModel)]="pendingSchemaName"
+        placeholder="Enter a name for this item"
+        class="w-full mt-2"
+        (keyup.enter)="saveWithName()">
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancelSaveDialog()"></p-button>
+      <p-button label="Save" icon="pi pi-save" (onClick)="saveWithName()"></p-button>
+    </ng-template>
+  </p-dialog>
+
   <p-toolbar class="main-toolbar">
     <div class="p-toolbar-group-start">
       <i class="pi pi-code" style="font-size: 1.5rem; margin-right: 0.5rem; color: #667eea;"></i>
       <span class="toolbar-title">JSON Tool</span>
+      <span *ngIf="currentSchemaName" class="schema-name">- {{ currentSchemaName }}</span>
     </div>
 
     <div class="p-toolbar-group-end">
       <p-button
-        *ngIf="isAuthenticated"
-        icon="pi pi-cloud-upload"
-        (onClick)="saveToFirebase()"
+        icon="pi pi-save"
+        (onClick)="saveCurrentWork()"
         severity="success"
         [text]="true"
         [rounded]="true"
-        pTooltip="Save to Cloud"
+        pTooltip="Save (Ctrl+S)"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -55,7 +79,7 @@
         severity="info"
         [text]="true"
         [rounded]="true"
-        [pTooltip]="viewMode === 'flat' ? 'Switch to Edit View' : 'Switch to Flat View'"
+        [pTooltip]="viewMode === 'flat' ? 'Switch to Flat View' : 'Switch to Edit View'"
         tooltipPosition="bottom">
       </p-button>
       <p-button

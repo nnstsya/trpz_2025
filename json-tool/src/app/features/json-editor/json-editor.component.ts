@@ -1,12 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { SplitterModule } from 'primeng/splitter';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Subscription } from 'rxjs';
 import { JsonTextEditorComponent } from './components/json-text-editor/json-text-editor.component';
 import { SchemaEditorComponent } from './components/schema-editor/schema-editor.component';
 import { JsonSchemaService } from '../../core/services/json-schema.service';
@@ -27,12 +31,15 @@ import { TreeNode } from 'primeng/api';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ButtonModule,
     ToastModule,
     ToolbarModule,
     SplitterModule,
     TooltipModule,
     ConfirmDialogModule,
+    DialogModule,
+    InputTextModule,
     JsonTextEditorComponent,
     SchemaEditorComponent
   ],
@@ -40,7 +47,8 @@ import { TreeNode } from 'primeng/api';
   templateUrl: './json-editor.component.html',
   styleUrl: './json-editor.component.scss'
 })
-export class JsonEditorComponent implements OnInit {
+export class JsonEditorComponent implements OnInit, OnDestroy {
+  private subscriptions: Subscription[] = [];
   jsonText: string = '{\n  "name": "John Doe",\n  "email": "john@example.com",\n  "age": 30\n}';
   schema: JsonSchema = { properties: [] };
   validationResult: ValidationResult | null = null;
@@ -54,12 +62,15 @@ export class JsonEditorComponent implements OnInit {
   private propertyChangeTimeout: any;
   private schemaBeforeEdit: JsonSchema | null = null;
   currentSchemaId: string | null = null;
+  currentSchemaName: string = '';
   isAuthenticated: boolean = false;
   private jsonTextHistory: string[] = [];
   private jsonTextHistoryIndex: number = -1;
   private isUpdatingFromHistory: boolean = false;
   jsonComplete: boolean = true;
   jsonErrors: { line: number; message: string; column?: number }[] = [];
+  showNameDialog: boolean = false;
+  pendingSchemaName: string = '';
 
   exportFormats = [
     { label: 'Markdown', value: 'markdown' },
@@ -86,9 +97,23 @@ export class JsonEditorComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.firebaseService.currentUser$.subscribe(user => {
-      this.isAuthenticated = !!user;
-    });
+    this.subscriptions.push(
+      this.firebaseService.currentUser$.subscribe(user => {
+        this.isAuthenticated = !!user;
+      })
+    );
+
+    this.subscriptions.push(
+      this.autoSaveObserver.saveStatus$.subscribe(status => {
+        if (status === 'saving') {
+          this.autoSaveStatus = 'Saving...';
+        } else if (status === 'saved') {
+          this.autoSaveStatus = 'Saved';
+        } else if (status === 'error') {
+          this.autoSaveStatus = 'Error';
+        }
+      })
+    );
 
     this.route.queryParams.subscribe(async params => {
       this.currentSchemaId = params['schemaId'] || null;
@@ -97,8 +122,14 @@ export class JsonEditorComponent implements OnInit {
         await this.loadSchemaFromFirebase(this.currentSchemaId);
       } else {
         this.schemaService.attach(this.autoSaveObserver);
-        this.schemaService.loadFromStorage();
-        this.schema = this.schemaService.getSchema();
+        const localData = this.autoSaveObserver.loadFromLocal();
+        if (localData.schema) {
+          this.schema = localData.schema;
+          this.schemaService.updateSchema(this.schema);
+        }
+        if (localData.jsonText) {
+          this.jsonText = localData.jsonText;
+        }
 
         if (this.schema.properties.length === 0) {
           this.initializeDefaultSchema();
@@ -114,6 +145,10 @@ export class JsonEditorComponent implements OnInit {
 
     this.jsonTextHistory.push(this.jsonText);
     this.jsonTextHistoryIndex = 0;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   expandAll(): void {
@@ -169,11 +204,30 @@ export class JsonEditorComponent implements OnInit {
 
   async saveCurrentWork(): Promise<void> {
     if (this.isAuthenticated && this.firebaseService.currentUser) {
-      await this.saveToFirebase();
+      if (!this.currentSchemaId) {
+        this.pendingSchemaName = '';
+        this.showNameDialog = true;
+      } else {
+        await this.saveToFirebase();
+      }
     } else {
-      this.schemaService.saveToStorage();
-      this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Schema saved locally' });
+      this.autoSaveObserver.updateWithJsonText(this.schema, this.jsonText, null);
+      this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Saved locally' });
     }
+  }
+
+  async saveWithName(): Promise<void> {
+    this.showNameDialog = false;
+    const schemaId = `schema_${Date.now()}`;
+    this.currentSchemaId = schemaId;
+    this.currentSchemaName = this.pendingSchemaName || schemaId;
+    await this.saveToFirebase();
+    this.router.navigate(['/editor'], { queryParams: { schemaId } });
+  }
+
+  cancelSaveDialog(): void {
+    this.showNameDialog = false;
+    this.pendingSchemaName = '';
   }
 
   undoJsonText(): void {
@@ -201,7 +255,6 @@ export class JsonEditorComponent implements OnInit {
   onJsonTextChange(newText: string): void {
     this.jsonText = newText;
     this.updateCharCount();
-    this.autoSaveStatus = 'Saving...';
 
     if (!this.isUpdatingFromHistory) {
       if (this.jsonTextHistoryIndex < this.jsonTextHistory.length - 1) {
@@ -216,9 +269,16 @@ export class JsonEditorComponent implements OnInit {
       }
     }
 
-    setTimeout(() => {
-      this.autoSaveStatus = 'Saved';
-    }, 500);
+    this.triggerAutosave();
+  }
+
+  private triggerAutosave(): void {
+    this.autoSaveObserver.updateWithJsonText(
+      this.schema,
+      this.jsonText,
+      this.currentSchemaId,
+      this.currentSchemaName
+    );
   }
 
   updateCharCount(): void {
@@ -324,6 +384,7 @@ export class JsonEditorComponent implements OnInit {
   updateSchema(): void {
     this.schemaService.updateSchema(this.schema);
     this.updateTreeData();
+    this.triggerAutosave();
   }
 
   onPropertyFocus(): void {
@@ -543,7 +604,7 @@ export class JsonEditorComponent implements OnInit {
           const existingProp = this.schema.properties.find(p => p.name === fullKey);
           if (!existingProp) {
             let exampleValue = value;
-            // For objects, don't store the whole object as example, just indicate it's an object
+
             if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
               exampleValue = '{}';
             } else if (typeof value === 'object' && value !== null) {
@@ -559,7 +620,6 @@ export class JsonEditorComponent implements OnInit {
             });
           }
 
-          // Recursively process nested objects to create properties for all nested fields
           if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
             processObject(value, fullKey);
           }
@@ -628,8 +688,7 @@ export class JsonEditorComponent implements OnInit {
 
   exportJsonText(): void {
     try {
-      // Validate JSON before exporting
-      JSON.parse(this.jsonText);
+       JSON.parse(this.jsonText);
       this.exportService.downloadFile(this.jsonText, 'data.json', 'application/json');
       this.messageService.add({ severity: 'success', summary: 'Exported', detail: 'JSON text exported successfully' });
     } catch (error) {
@@ -638,10 +697,8 @@ export class JsonEditorComponent implements OnInit {
   }
 
   importSchema(event: any): void {
-    // Handle different PrimeNG event structures
     let file = null;
 
-    // Try different event structures
     if (event.files && event.files.length > 0) {
       file = event.files[0];
     } else if (event.currentFiles && event.currentFiles.length > 0) {
@@ -791,11 +848,17 @@ export class JsonEditorComponent implements OnInit {
 
     try {
       const schemaId = this.currentSchemaId || `schema_${Date.now()}`;
-      await this.firebaseService.saveUserSchema(user.uid, schemaId, this.schema);
+      await this.firebaseService.saveUserSchema(
+        user.uid,
+        schemaId,
+        this.schema,
+        this.jsonText,
+        this.currentSchemaName || schemaId
+      );
       this.currentSchemaId = schemaId;
-      this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Schema saved to cloud' });
+      this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Saved to cloud' });
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save schema' });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save' });
     }
   }
 
@@ -806,13 +869,23 @@ export class JsonEditorComponent implements OnInit {
     try {
       const data = await this.firebaseService.getUserSchema(user.uid, schemaId);
       if (data) {
-        this.schema = data;
+        this.schema = { properties: data.properties || [] };
         this.schemaService.updateSchema(this.schema);
+        if (data.jsonText) {
+          this.jsonText = data.jsonText;
+          this.jsonTextHistory = [this.jsonText];
+          this.jsonTextHistoryIndex = 0;
+        }
+        if (data.name) {
+          this.currentSchemaName = data.name;
+        }
         this.updateTreeData();
-        this.messageService.add({ severity: 'success', summary: 'Loaded', detail: 'Schema loaded from cloud' });
+        this.updateCharCount();
+        this.checkJsonComplete();
+        this.messageService.add({ severity: 'success', summary: 'Loaded', detail: 'Loaded from cloud' });
       }
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load schema' });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load' });
     }
   }
 

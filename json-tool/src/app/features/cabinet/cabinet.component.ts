@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -7,6 +8,9 @@ import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -14,6 +18,7 @@ interface SchemaItem {
   id: string;
   name?: string;
   properties: any[];
+  jsonText?: string;
   updatedAt: string;
 }
 
@@ -22,12 +27,16 @@ interface SchemaItem {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ButtonModule,
     CardModule,
     TableModule,
     ToastModule,
     ToolbarModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    DialogModule,
+    InputTextModule,
+    TooltipModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './cabinet.component.html',
@@ -37,6 +46,9 @@ export class CabinetComponent implements OnInit {
   schemas: SchemaItem[] = [];
   loading: boolean = false;
   userEmail: string = '';
+  showRenameDialog: boolean = false;
+  renameSchemaId: string = '';
+  renameValue: string = '';
 
   constructor(
     private firebaseService: FirebaseService,
@@ -108,5 +120,41 @@ export class CabinetComponent implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleString();
+  }
+
+  openRenameDialog(schema: SchemaItem): void {
+    this.renameSchemaId = schema.id;
+    this.renameValue = schema.name || schema.id;
+    this.showRenameDialog = true;
+  }
+
+  cancelRename(): void {
+    this.showRenameDialog = false;
+    this.renameSchemaId = '';
+    this.renameValue = '';
+  }
+
+  async saveRename(): Promise<void> {
+    const user = this.firebaseService.currentUser;
+    if (!user || !this.renameSchemaId) return;
+
+    try {
+      await this.firebaseService.updateSchemaName(user.uid, this.renameSchemaId, this.renameValue);
+      this.messageService.add({ severity: 'success', summary: 'Renamed', detail: 'Item renamed successfully' });
+      this.showRenameDialog = false;
+      await this.loadSchemas();
+    } catch (error: any) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to rename' });
+    }
+  }
+
+  getDisplayName(schema: SchemaItem): string {
+    return schema.name || schema.id;
+  }
+
+  getJsonPreview(schema: SchemaItem): string {
+    if (!schema.jsonText) return '-';
+    const preview = schema.jsonText.substring(0, 50);
+    return preview.length < schema.jsonText.length ? preview + '...' : preview;
   }
 }

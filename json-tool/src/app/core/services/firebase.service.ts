@@ -70,12 +70,26 @@ export class FirebaseService {
     await signOut(this.auth);
   }
 
-  async saveUserSchema(userId: string, schemaId: string, schemaData: any): Promise<void> {
+  async saveUserSchema(userId: string, schemaId: string, schemaData: any, jsonText?: string, name?: string): Promise<void> {
     const schemaRef = doc(this.firestore, `users/${userId}/schemas/${schemaId}`);
     await setDoc(schemaRef, {
       ...schemaData,
+      jsonText: jsonText ?? '',
+      name: name ?? schemaId,
       updatedAt: new Date().toISOString()
     });
+  }
+
+  async updateSchemaName(userId: string, schemaId: string, name: string): Promise<void> {
+    const schemaRef = doc(this.firestore, `users/${userId}/schemas/${schemaId}`);
+    const schemaDoc = await getDoc(schemaRef);
+    if (schemaDoc.exists()) {
+      await setDoc(schemaRef, {
+        ...schemaDoc.data(),
+        name,
+        updatedAt: new Date().toISOString()
+      });
+    }
   }
 
   async getUserSchema(userId: string, schemaId: string): Promise<any> {

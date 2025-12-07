@@ -50,3 +50,24 @@
 .mr-2 {
   margin-right: 0.5rem;
 }
+
+.json-preview {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8rem;
+  color: #666;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+
+  label {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+}

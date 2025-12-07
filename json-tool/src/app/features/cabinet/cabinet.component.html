@@ -2,10 +2,34 @@
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
+  <p-dialog
+    header="Rename"
+    [(visible)]="showRenameDialog"
+    [modal]="true"
+    [style]="{ width: '400px' }"
+    [closable]="true"
+    (onHide)="cancelRename()">
+    <div class="dialog-content">
+      <label for="itemName">Name</label>
+      <input
+        id="itemName"
+        type="text"
+        pInputText
+        [(ngModel)]="renameValue"
+        placeholder="Enter a new name"
+        class="w-full mt-2"
+        (keyup.enter)="saveRename()">
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancelRename()"></p-button>
+      <p-button label="Save" icon="pi pi-save" (onClick)="saveRename()"></p-button>
+    </ng-template>
+  </p-dialog>
+
   <p-toolbar class="cabinet-toolbar">
     <div class="p-toolbar-group-start">
       <i class="pi pi-briefcase" style="font-size: 1.5rem; margin-right: 0.5rem; color: #667eea;"></i>
-      <span class="toolbar-title">My Schemas</span>
+      <span class="toolbar-title">My Saved Items</span>
     </div>
 
     <div class="p-toolbar-group-end">
@@ -24,10 +48,10 @@
     <p-card>
       <ng-template pTemplate="header">
         <div class="card-header-content">
-          <h3>Your Schemas</h3>
+          <h3>Saved Schemas & JSON</h3>
           <p-button
             icon="pi pi-plus"
-            label="New Schema"
+            label="New"
             (onClick)="createNewSchema()"
             size="small">
           </p-button>
@@ -42,24 +66,37 @@
         styleClass="schemas-table">
         <ng-template pTemplate="header">
           <tr>
-            <th>Schema ID</th>
-            <th>Properties Count</th>
+            <th>Name</th>
+            <th>Properties</th>
+            <th>JSON Preview</th>
             <th>Last Updated</th>
-            <th style="width: 200px">Actions</th>
+            <th style="width: 250px">Actions</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-schema>
           <tr>
-            <td>{{ schema.id }}</td>
-            <td>{{ schema.properties.length }}</td>
+            <td>{{ getDisplayName(schema) }}</td>
+            <td>{{ schema.properties?.length || 0 }}</td>
+            <td class="json-preview">{{ getJsonPreview(schema) }}</td>
             <td>{{ formatDate(schema.updatedAt) }}</td>
             <td>
               <p-button
                 icon="pi pi-folder-open"
-                label="Open"
                 (onClick)="openSchema(schema.id)"
                 size="small"
                 [outlined]="true"
+                pTooltip="Open"
+                tooltipPosition="top"
+                styleClass="mr-2">
+              </p-button>
+              <p-button
+                icon="pi pi-pencil"
+                (onClick)="openRenameDialog(schema)"
+                severity="secondary"
+                size="small"
+                [outlined]="true"
+                pTooltip="Rename"
+                tooltipPosition="top"
                 styleClass="mr-2">
               </p-button>
               <p-button
@@ -67,19 +104,21 @@
                 (onClick)="deleteSchema(schema)"
                 severity="danger"
                 size="small"
-                [outlined]="true">
+                [outlined]="true"
+                pTooltip="Delete"
+                tooltipPosition="top">
               </p-button>
             </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="4" class="empty-state">
+            <td colspan="5" class="empty-state">
               <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-              <p>No schemas found</p>
+              <p>No saved items found</p>
               <p-button
                 icon="pi pi-plus"
-                label="Create Your First Schema"
+                label="Create Your First Item"
                 (onClick)="createNewSchema()"
                 size="small">
               </p-button>
