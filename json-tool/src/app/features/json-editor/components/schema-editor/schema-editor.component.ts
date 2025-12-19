@@ -56,19 +56,19 @@ export class SchemaEditorComponent implements OnChanges {
   sortOrder: number = 1;
 
   dataTypes = [
-    { label: 'String', value: 'string' },
-    { label: 'Number', value: 'number' },
-    { label: 'Boolean', value: 'boolean' },
-    { label: 'Array', value: 'array' },
-    { label: 'Object', value: 'object' },
-    { label: 'Null', value: 'null' }
+    { label: 'Рядок', value: 'string' },
+    { label: 'Число', value: 'number' },
+    { label: 'Логічне значення', value: 'boolean' },
+    { label: 'Масив', value: 'array' },
+    { label: 'Об\'єкт', value: 'object' },
+    { label: 'Нульове значення', value: 'null' }
   ];
 
   formatTypes = [
-    { label: 'None', value: '' },
-    { label: 'Email', value: 'email' },
+    { label: 'Немає', value: '' },
+    { label: 'Електронна пошта', value: 'email' },
     { label: 'URL', value: 'url' },
-    { label: 'Date', value: 'date' }
+    { label: 'Дата', value: 'date' }
   ];
 
   ngOnChanges(changes: SimpleChanges): void {

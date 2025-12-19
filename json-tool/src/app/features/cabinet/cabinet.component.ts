@@ -75,7 +75,7 @@ export class CabinetComponent implements OnInit {
     try {
       this.schemas = await this.firebaseService.getUserSchemas(user.uid);
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load schemas' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка завантаження схем' });
     } finally {
       this.loading = false;
     }
@@ -91,8 +91,8 @@ export class CabinetComponent implements OnInit {
 
   deleteSchema(schema: SchemaItem): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete this schema?`,
-      header: 'Confirm Delete',
+      message: `Ви впевнені, що хочете видалити цю схему?`,
+      header: 'Підтвердити видалення',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         const user = this.firebaseService.currentUser;
@@ -100,10 +100,10 @@ export class CabinetComponent implements OnInit {
 
         try {
           await this.firebaseService.deleteUserSchema(user.uid, schema.id);
-          this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Schema deleted successfully' });
+          this.messageService.add({ severity: 'success', summary: 'Видалено', detail: 'Схема успішно видалена' });
           await this.loadSchemas();
         } catch (error: any) {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete schema' });
+          this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка видалення схеми' });
         }
       }
     });
@@ -114,7 +114,7 @@ export class CabinetComponent implements OnInit {
       await this.firebaseService.signOut();
       this.router.navigate(['/auth']);
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to sign out' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка виходу' });
     }
   }
 
@@ -140,11 +140,11 @@ export class CabinetComponent implements OnInit {
 
     try {
       await this.firebaseService.updateSchemaName(user.uid, this.renameSchemaId, this.renameValue);
-      this.messageService.add({ severity: 'success', summary: 'Renamed', detail: 'Item renamed successfully' });
+      this.messageService.add({ severity: 'success', summary: 'Перейменовано', detail: 'Елемент успішно перейменовано' });
       this.showRenameDialog = false;
       await this.loadSchemas();
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to rename' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка перейменування' });
     }
   }
 

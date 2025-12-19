@@ -212,7 +212,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
       }
     } else {
       this.autoSaveObserver.updateWithJsonText(this.schema, this.jsonText, null);
-      this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Saved locally' });
+      this.messageService.add({ severity: 'success', summary: 'Збережено', detail: 'Збережено локально' });
     }
   }
 
@@ -237,7 +237,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
       this.jsonText = this.jsonTextHistory[this.jsonTextHistoryIndex];
       this.updateCharCount();
       this.isUpdatingFromHistory = false;
-      this.messageService.add({ severity: 'info', summary: 'Undo', detail: 'JSON text reverted' });
+      this.messageService.add({ severity: 'info', summary: 'Скасування', detail: 'Текст JSON повернено' });
     }
   }
 
@@ -248,7 +248,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
       this.jsonText = this.jsonTextHistory[this.jsonTextHistoryIndex];
       this.updateCharCount();
       this.isUpdatingFromHistory = false;
-      this.messageService.add({ severity: 'info', summary: 'Redo', detail: 'JSON text restored' });
+      this.messageService.add({ severity: 'info', summary: 'Повтор', detail: 'Текст JSON відновлено' });
     }
   }
 
@@ -352,13 +352,13 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
     );
 
     this.historyService.executeCommand(command);
-    this.messageService.add({ severity: 'success', summary: 'Property Added', detail: 'New property added to schema' });
+    this.messageService.add({ severity: 'success', summary: 'Властивість додана', detail: 'Нова властивість додана до схеми' });
   }
 
   removeProperty(property: JsonSchemaProperty): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete property "${property.name}"?`,
-      header: 'Confirm Delete',
+      message: `Ви впевнені, що хочете видалити властивість "${property.name}"?`,
+      header: 'Підтвердити видалення',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         const previousSchema = JSON.parse(JSON.stringify(this.schemaService.getSchema()));
@@ -376,7 +376,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
         );
 
         this.historyService.executeCommand(command);
-        this.messageService.add({ severity: 'info', summary: 'Property Removed', detail: 'Property removed from schema' });
+        this.messageService.add({ severity: 'info', summary: 'Властивість видалена', detail: 'Властивість видалена зі схеми' });
       }
     });
   }
@@ -424,18 +424,18 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
   minifyJson(): void {
     try {
       this.jsonText = this.formatService.minify(this.jsonText);
-      this.messageService.add({ severity: 'success', summary: 'Minified', detail: 'JSON minified successfully' });
+      this.messageService.add({ severity: 'success', summary: 'Мініфікована', detail: 'JSON успішно мініфіковано' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid JSON format' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Невірний формат JSON' });
     }
   }
 
   prettifyJson(): void {
     try {
       this.jsonText = this.formatService.prettify(this.jsonText);
-      this.messageService.add({ severity: 'success', summary: 'Prettified', detail: 'JSON prettified successfully' });
+      this.messageService.add({ severity: 'success', summary: 'Форматована', detail: 'JSON успішно форматовано' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid JSON format' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Невірний формат JSON' });
     }
   }
 
@@ -460,9 +460,9 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
 
       this.jsonText = newJsonText;
       this.updateCharCount();
-      this.messageService.add({ severity: 'success', summary: 'Sorted', detail: 'JSON keys sorted alphabetically' });
+      this.messageService.add({ severity: 'success', summary: 'Відсортована', detail: 'Ключі JSON відсортовані за алфавітом' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid JSON format' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Невірний формат JSON' });
     }
   }
 
@@ -484,10 +484,10 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
     this.parseJsonErrors();
 
     if (this.validationResult.valid) {
-      this.messageService.add({ severity: 'success', summary: 'Valid', detail: 'JSON is valid according to schema' });
+      this.messageService.add({ severity: 'success', summary: 'Дійсно', detail: 'JSON дійсний відповідно до схеми' });
       this.generateSchemaFromJson();
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Invalid', detail: `Found ${this.validationResult.errors.length} validation errors` });
+      this.messageService.add({ severity: 'error', summary: 'Невірна', detail: `Знайдено ${this.validationResult.errors.length} помилок перевірки` });
     }
   }
 
@@ -613,7 +613,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
 
             newProperties.push({
               name: fullKey,
-              description: `Auto-generated from JSON`,
+              description: `Автоматично генеровано з JSON`,
               example: exampleValue,
               dataType: dataType,
               format: inferFormat(key, value)
@@ -646,8 +646,8 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
         this.historyService.executeCommand(command);
         this.messageService.add({
           severity: 'success',
-          summary: 'Schema Generated',
-          detail: `Added ${newProperties.length} new properties from JSON`
+          summary: 'Схема генерована',
+          detail: `Додано ${newProperties.length} нових властивостей з JSON`
         });
       }
     } catch (error) {
@@ -683,16 +683,16 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
     }
 
     this.exportService.downloadFile(content, filename, mimeType);
-    this.messageService.add({ severity: 'success', summary: 'Exported', detail: `Schema exported as ${this.selectedExportFormat.toUpperCase()}` });
+    this.messageService.add({ severity: 'success', summary: 'Експортовано', detail: `Схема експортована як ${this.selectedExportFormat.toUpperCase()}` });
   }
 
   exportJsonText(): void {
     try {
        JSON.parse(this.jsonText);
       this.exportService.downloadFile(this.jsonText, 'data.json', 'application/json');
-      this.messageService.add({ severity: 'success', summary: 'Exported', detail: 'JSON text exported successfully' });
+      this.messageService.add({ severity: 'success', summary: 'Експортовано', detail: 'Текст JSON успішно експортовано' });
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Cannot export invalid JSON' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Неможливо експортувати невірний JSON' });
     }
   }
 
@@ -709,7 +709,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
 
     if (!file) {
       console.error('No file found in event:', event);
-      this.messageService.add({ severity: 'warn', summary: 'No File', detail: 'Please select a file to import' });
+      this.messageService.add({ severity: 'warn', summary: 'Немає файлу', detail: 'Будь ласка, виберіть файл для імпортування' });
       return;
     }
 
@@ -753,15 +753,15 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
         );
 
         this.historyService.executeCommand(command);
-        this.messageService.add({ severity: 'success', summary: 'Imported', detail: 'Schema imported successfully' });
+        this.messageService.add({ severity: 'success', summary: 'Імпортовано', detail: 'Схема успішно імпортована' });
       } catch (error: any) {
         console.error('Import error:', error);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.message || 'Failed to import schema' });
+        this.messageService.add({ severity: 'error', summary: 'Помилка', detail: error.message || 'Помилка імпортування схеми' });
       }
     };
 
     reader.onerror = () => {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to read file' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка читання файлу' });
     };
 
     reader.readAsText(file);
@@ -771,14 +771,14 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
     this.historyService.undo();
     this.schema = JSON.parse(JSON.stringify(this.schemaService.getSchema()));
     this.updateTreeData();
-    this.messageService.add({ severity: 'info', summary: 'Undo', detail: 'Action undone' });
+    this.messageService.add({ severity: 'info', summary: 'Скасування', detail: 'Дія скасована' });
   }
 
   redo(): void {
     this.historyService.redo();
     this.schema = JSON.parse(JSON.stringify(this.schemaService.getSchema()));
     this.updateTreeData();
-    this.messageService.add({ severity: 'info', summary: 'Redo', detail: 'Action redone' });
+    this.messageService.add({ severity: 'info', summary: 'Повтор', detail: 'Дія повторена' });
   }
 
   canUndo(): boolean {
@@ -842,7 +842,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
   async saveToFirebase(): Promise<void> {
     const user = this.firebaseService.currentUser;
     if (!user) {
-      this.messageService.add({ severity: 'warn', summary: 'Not Authenticated', detail: 'Please sign in to save to cloud' });
+      this.messageService.add({ severity: 'warn', summary: 'Не автентифіковано', detail: 'Будь ласка, увійдіть, щоб зберегти в хмару' });
       return;
     }
 
@@ -856,9 +856,9 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
         this.currentSchemaName || schemaId
       );
       this.currentSchemaId = schemaId;
-      this.messageService.add({ severity: 'success', summary: 'Saved', detail: 'Saved to cloud' });
+      this.messageService.add({ severity: 'success', summary: 'Збережено', detail: 'Збережено в хмару' });
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка збереження' });
     }
   }
 
@@ -882,10 +882,10 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
         this.updateTreeData();
         this.updateCharCount();
         this.checkJsonComplete();
-        this.messageService.add({ severity: 'success', summary: 'Loaded', detail: 'Loaded from cloud' });
+        this.messageService.add({ severity: 'success', summary: 'Завантажено', detail: 'Завантажено з хмари' });
       }
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка завантаження' });
     }
   }
 
@@ -898,7 +898,7 @@ export class JsonEditorComponent implements OnInit, OnDestroy {
       await this.firebaseService.signOut();
       this.router.navigate(['/auth']);
     } catch (error: any) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to sign out' });
+      this.messageService.add({ severity: 'error', summary: 'Помилка', detail: 'Помилка виходу' });
     }
   }
 }

@@ -3,33 +3,33 @@
   <p-confirmDialog></p-confirmDialog>
 
   <p-dialog
-    header="Save As"
+    header="Зберегти як"
     [(visible)]="showNameDialog"
     [modal]="true"
     [style]="{ width: '400px' }"
     [closable]="true"
     (onHide)="cancelSaveDialog()">
     <div class="dialog-content">
-      <label for="schemaName">Name</label>
+      <label for="schemaName">Ім'я</label>
       <input
         id="schemaName"
         type="text"
         pInputText
         [(ngModel)]="pendingSchemaName"
-        placeholder="Enter a name for this item"
+        placeholder="Введіть ім'я для цього елемента"
         class="w-full mt-2"
         (keyup.enter)="saveWithName()">
     </div>
     <ng-template pTemplate="footer">
-      <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancelSaveDialog()"></p-button>
-      <p-button label="Save" icon="pi pi-save" (onClick)="saveWithName()"></p-button>
+      <p-button label="Скасувати" severity="secondary" [text]="true" (onClick)="cancelSaveDialog()"></p-button>
+      <p-button label="Зберегти" icon="pi pi-save" (onClick)="saveWithName()"></p-button>
     </ng-template>
   </p-dialog>
 
   <p-toolbar class="main-toolbar">
     <div class="p-toolbar-group-start">
       <i class="pi pi-code" style="font-size: 1.5rem; margin-right: 0.5rem; color: #667eea;"></i>
-      <span class="toolbar-title">JSON Tool</span>
+      <span class="toolbar-title">JSON Інструмент</span>
       <span *ngIf="currentSchemaName" class="schema-name">- {{ currentSchemaName }}</span>
     </div>
 
@@ -40,7 +40,7 @@
         severity="success"
         [text]="true"
         [rounded]="true"
-        pTooltip="Save (Ctrl+S)"
+        pTooltip="Зберегти (Ctrl+S)"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -50,7 +50,7 @@
         severity="info"
         [text]="true"
         [rounded]="true"
-        pTooltip="My Schemas"
+        pTooltip="Мої схеми"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -60,7 +60,7 @@
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        pTooltip="Undo (Ctrl+Z)"
+        pTooltip="Скасування (Ctrl+Z)"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -70,7 +70,7 @@
         severity="secondary"
         [text]="true"
         [rounded]="true"
-        pTooltip="Redo (Ctrl+Y)"
+        pTooltip="Повтор (Ctrl+Y)"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -79,7 +79,7 @@
         severity="info"
         [text]="true"
         [rounded]="true"
-        [pTooltip]="viewMode === 'flat' ? 'Switch to Flat View' : 'Switch to Edit View'"
+        [pTooltip]="viewMode === 'flat' ? 'Перейти до плоского подання' : 'Перейти до подання редагування'"
         tooltipPosition="bottom">
       </p-button>
       <p-button
@@ -89,7 +89,7 @@
         severity="danger"
         [text]="true"
         [rounded]="true"
-        pTooltip="Sign Out"
+        pTooltip="Вийти"
         tooltipPosition="bottom">
       </p-button>
     </div>
@@ -142,26 +142,26 @@
 
   <div class="status-bar">
     <div class="status-item">
-      <i class="pi pi-circle-fill status-icon" [class.status-saved]="autoSaveStatus === 'Saved'" [class.status-saving]="autoSaveStatus === 'Saving...'"></i>
+      <i class="pi pi-circle-fill status-icon" [class.status-saved]="autoSaveStatus === 'Збережено'" [class.status-saving]="autoSaveStatus === 'Збереження...'"></i>
       <span>{{ autoSaveStatus }}</span>
     </div>
     <div class="status-item">
       <i class="pi" [ngClass]="jsonComplete ? 'pi-check-circle' : 'pi-exclamation-triangle'"
          [style.color]="jsonComplete ? '#22c55e' : '#f59e0b'"></i>
-      <span>{{ jsonComplete ? 'Complete' : 'Incomplete' }}</span>
+      <span>{{ jsonComplete ? 'Завершено' : 'Не завершено' }}</span>
     </div>
     <div class="status-item" *ngIf="validationResult">
       <i class="pi" [ngClass]="validationResult.valid ? 'pi-check-circle' : 'pi-times-circle'"
          [style.color]="validationResult.valid ? '#22c55e' : '#ef4444'"></i>
-      <span>{{ validationResult.valid ? 'Valid' : validationResult.errors.length + ' Error(s)' }}</span>
+      <span>{{ validationResult.valid ? 'Дійсно' : validationResult.errors.length + ' Помилка(и)' }}</span>
     </div>
     <div class="status-item">
       <i class="pi pi-align-left"></i>
-      <span>Ln {{ cursorLine }}, Col {{ cursorColumn }}</span>
+      <span>Рядок {{ cursorLine }}, Стовб {{ cursorColumn }}</span>
     </div>
     <div class="status-item">
       <i class="pi pi-database"></i>
-      <span>{{ schema.properties.length }} Properties</span>
+      <span>{{ schema.properties.length }} Властивостей</span>
     </div>
   </div>
 </div>

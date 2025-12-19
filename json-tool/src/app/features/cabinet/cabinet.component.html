@@ -3,40 +3,40 @@
   <p-confirmDialog></p-confirmDialog>
 
   <p-dialog
-    header="Rename"
+    header="Перейменувати"
     [(visible)]="showRenameDialog"
     [modal]="true"
     [style]="{ width: '400px' }"
     [closable]="true"
     (onHide)="cancelRename()">
     <div class="dialog-content">
-      <label for="itemName">Name</label>
+      <label for="itemName">Ім'я</label>
       <input
         id="itemName"
         type="text"
         pInputText
         [(ngModel)]="renameValue"
-        placeholder="Enter a new name"
+        placeholder="Введіть нове ім'я"
         class="w-full mt-2"
         (keyup.enter)="saveRename()">
     </div>
     <ng-template pTemplate="footer">
-      <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancelRename()"></p-button>
-      <p-button label="Save" icon="pi pi-save" (onClick)="saveRename()"></p-button>
+      <p-button label="Скасувати" severity="secondary" [text]="true" (onClick)="cancelRename()"></p-button>
+      <p-button label="Зберегти" icon="pi pi-save" (onClick)="saveRename()"></p-button>
     </ng-template>
   </p-dialog>
 
   <p-toolbar class="cabinet-toolbar">
     <div class="p-toolbar-group-start">
       <i class="pi pi-briefcase" style="font-size: 1.5rem; margin-right: 0.5rem; color: #667eea;"></i>
-      <span class="toolbar-title">My Saved Items</span>
+      <span class="toolbar-title">Мої збережені елементи</span>
     </div>
 
     <div class="p-toolbar-group-end">
       <span class="user-email">{{ userEmail }}</span>
       <p-button
         icon="pi pi-sign-out"
-        label="Sign Out"
+        label="Вийти"
         (onClick)="signOut()"
         severity="secondary"
         [text]="true">
@@ -48,10 +48,10 @@
     <p-card>
       <ng-template pTemplate="header">
         <div class="card-header-content">
-          <h3>Saved Schemas & JSON</h3>
+          <h3>Збережені схеми та JSON</h3>
           <p-button
             icon="pi pi-plus"
-            label="New"
+            label="Новий"
             (onClick)="createNewSchema()"
             size="small">
           </p-button>
@@ -66,11 +66,11 @@
         styleClass="schemas-table">
         <ng-template pTemplate="header">
           <tr>
-            <th>Name</th>
-            <th>Properties</th>
-            <th>JSON Preview</th>
-            <th>Last Updated</th>
-            <th style="width: 250px">Actions</th>
+            <th>Ім'я</th>
+            <th>Властивості</th>
+            <th>Попередній перегляд JSON</th>
+            <th>Останнього оновлення</th>
+            <th style="width: 250px">Дії</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-schema>
@@ -85,7 +85,7 @@
                 (onClick)="openSchema(schema.id)"
                 size="small"
                 [outlined]="true"
-                pTooltip="Open"
+                pTooltip="Відкрити"
                 tooltipPosition="top"
                 styleClass="mr-2">
               </p-button>
@@ -95,7 +95,7 @@
                 severity="secondary"
                 size="small"
                 [outlined]="true"
-                pTooltip="Rename"
+                pTooltip="Перейменувати"
                 tooltipPosition="top"
                 styleClass="mr-2">
               </p-button>
@@ -105,7 +105,7 @@
                 severity="danger"
                 size="small"
                 [outlined]="true"
-                pTooltip="Delete"
+                pTooltip="Видалити"
                 tooltipPosition="top">
               </p-button>
             </td>
@@ -115,10 +115,10 @@
           <tr>
             <td colspan="5" class="empty-state">
               <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-              <p>No saved items found</p>
+              <p>Немає збережених елементів</p>
               <p-button
                 icon="pi pi-plus"
-                label="Create Your First Item"
+                label="Створіть свій перший елемент"
                 (onClick)="createNewSchema()"
                 size="small">
               </p-button>

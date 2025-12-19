@@ -6,38 +6,38 @@
       <ng-template pTemplate="header">
         <div class="auth-header">
           <i class="pi pi-code" style="font-size: 2.5rem; color: #667eea;"></i>
-          <h2>JSON Tool</h2>
-          <p>{{ isSignUp ? 'Create your account' : 'Sign in to your account' }}</p>
+          <h2>JSON Інструмент</h2>
+          <p>{{ isSignUp ? 'Створіть свій рахунок' : 'Увійдіть до свого рахунку' }}</p>
         </div>
       </ng-template>
 
       <div class="auth-form">
         <div class="form-field">
-          <label for="email">Email</label>
+          <label for="email">Електронна пошта</label>
           <input
             id="email"
             type="email"
             pInputText
             [(ngModel)]="email"
-            placeholder="Enter your email"
+            placeholder="Введіть вашу електронну пошту"
             [disabled]="loading">
         </div>
 
         <div class="form-field">
-          <label for="password">Password</label>
+          <label for="password">Пароль</label>
           <p-password
             id="password"
             [(ngModel)]="password"
             [feedback]="isSignUp"
             [toggleMask]="true"
-            placeholder="Enter your password"
+            placeholder="Введіть ваш пароль"
             [disabled]="loading"
             [ngStyle]="{ width: '100%' }">
           </p-password>
         </div>
 
         <p-button
-          [label]="isSignUp ? 'Sign Up' : 'Sign In'"
+          [label]="isSignUp ? 'Зареєструватися' : 'Увійти'"
           (onClick)="isSignUp ? signUp() : signIn()"
           [loading]="loading"
           [style]="{'width': '100%'}"
@@ -45,11 +45,11 @@
         </p-button>
 
         <p-divider align="center">
-          <span class="divider-text">OR</span>
+          <span class="divider-text">АБО</span>
         </p-divider>
 
         <p-button
-          label="Continue with Google"
+          label="Продовжити з Google"
           icon="pi pi-google"
           (onClick)="signInWithGoogle()"
           [loading]="loading"
@@ -59,8 +59,8 @@
         </p-button>
 
         <div class="toggle-mode">
-          <span>{{ isSignUp ? 'Already have an account?' : "Don't have an account?" }}</span>
-          <a (click)="toggleMode()">{{ isSignUp ? 'Sign In' : 'Sign Up' }}</a>
+          <span>{{ isSignUp ? 'Вже маєте рахунок?' : "Немаєте рахунку?" }}</span>
+          <a (click)="toggleMode()">{{ isSignUp ? 'Увійти' : 'Зареєструватися' }}</a>
         </div>
       </div>
     </p-card>

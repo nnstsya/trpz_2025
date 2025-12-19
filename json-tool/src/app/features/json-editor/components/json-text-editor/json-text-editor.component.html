@@ -1,65 +1,65 @@
-<p-card header="JSON Editor" styleClass="editor-card">
+<p-card header="Редактор JSON" styleClass="editor-card">
   <ng-template pTemplate="header">
     <div class="card-header-content">
       <div class="header-left">
         <i class="pi pi-file-edit"></i>
-        <span>JSON Editor</span>
+        <span>Редактор JSON</span>
       </div>
       <div class="header-actions">
         <p-button
           icon="pi pi-arrow-down-left-and-arrow-up-right-to-center"
-          label="Minify"
+          label="Мініфікація"
           (onClick)="minify()"
           size="small"
           [outlined]="true"
-          pTooltip="Minify JSON"
+          pTooltip="Мініфікація JSON"
           tooltipPosition="bottom">
         </p-button>
         <p-button
           icon="pi pi-code"
-          label="Prettify"
+          label="Форматування"
           (onClick)="prettify()"
           size="small"
           [outlined]="true"
-          pTooltip="Format JSON with indentation"
+          pTooltip="Форматування JSON з відступом"
           tooltipPosition="bottom">
         </p-button>
         <p-button
           icon="pi pi-sort-alpha-down"
-          label="Sort Keys"
+          label="Сортування ключів"
           (onClick)="sortKeys()"
           size="small"
           [outlined]="true"
-          pTooltip="Sort JSON keys alphabetically"
+          pTooltip="Сортування ключів JSON за алфавітом"
           tooltipPosition="bottom">
         </p-button>
         <p-button
           icon="pi pi-sparkles"
-          label="Generate Schema"
+          label="Генерація схеми"
           (onClick)="generateSchema()"
           size="small"
           severity="help"
           [outlined]="true"
-          pTooltip="Auto-generate schema from JSON"
+          pTooltip="Автоматична генерація схеми з JSON"
           tooltipPosition="bottom">
         </p-button>
         <p-button
           icon="pi pi-check-circle"
-          label="Validate"
+          label="Перевірити"
           (onClick)="validate()"
           size="small"
           severity="success"
-          pTooltip="Validate against schema"
+          pTooltip="Перевірити проти схеми"
           tooltipPosition="bottom">
         </p-button>
         <p-button
           icon="pi pi-download"
-          label="Export JSON"
+          label="Експортувати JSON"
           (onClick)="exportJsonText()"
           size="small"
           severity="info"
           [outlined]="true"
-          pTooltip="Export JSON to file"
+          pTooltip="Експортувати JSON до файлу"
           tooltipPosition="bottom">
         </p-button>
       </div>
@@ -93,7 +93,7 @@
         (keydown)="handleAutoClose($event)"
         [rows]="15"
         class="json-editor"
-        placeholder="Enter your JSON here..."
+        placeholder="Введіть ваш JSON тут..."
         [autoResize]="false"
         spellcheck="false">
       </textarea>
@@ -104,13 +104,13 @@
     <p-message
       *ngIf="validationResult.valid"
       severity="success"
-      [text]="'JSON is valid according to schema'">
+      [text]="'JSON дійсний відповідно до схеми'">
     </p-message>
 
     <div *ngIf="!validationResult.valid">
       <p-message
         severity="error"
-        [text]="'Found ' + validationResult.errors.length + ' validation error(s)'">
+        [text]="'Знайдено ' + validationResult.errors.length + ' помилку(и) перевірки'">
       </p-message>
       <div class="error-list">
         <div *ngFor="let error of validationResult.errors" class="error-item">

@@ -1,21 +1,21 @@
-<p-card header="Schema Editor" styleClass="schema-card">
+<p-card header="Редактор схеми" styleClass="schema-card">
   <ng-template pTemplate="header">
     <div class="card-header-content">
       <div class="header-left">
         <i class="pi pi-database"></i>
-        <span>Schema Editor</span>
+        <span>Редактор схеми</span>
         <p-chip
           *ngIf="schema.properties.length > 0"
-          [label]="schema.properties.length + ' properties'"
+          [label]="schema.properties.length + ' властивостей'"
           styleClass="property-count-chip">
         </p-chip>
       </div>
       <div class="header-actions">
         <p-button
           icon="pi pi-plus"
-          label="Add Property"
+          label="Додати властивість"
           (onClick)="addProperty()"
-          pTooltip="Add new property"
+          pTooltip="Додати нову властивість"
           tooltipPosition="bottom"
         >
         </p-button>
@@ -29,7 +29,7 @@
           [auto]="true"
           [customUpload]="true"
           (onSelect)="importSchema($event)"
-          [chooseLabel]="'Import'">
+          [chooseLabel]="'Імпортувати'">
         </p-fileupload>
       </div>
     </div>
@@ -42,7 +42,7 @@
         pInputText
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange()"
-        placeholder="Search properties..."
+        placeholder="Пошук властивостей..."
         style="width: 100%; max-width: 300px;">
       <i class="pi pi-search"></i>
     </span>
@@ -58,20 +58,20 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 20%; cursor: pointer;" (click)="sortBy('name')">
-            Name
+            Ім'я
             <i class="pi" [ngClass]="sortField === 'name' ? (sortOrder === 1 ? 'pi-sort-up' : 'pi-sort-down') : 'pi-sort'"></i>
           </th>
           <th style="width: 25%; cursor: pointer;" (click)="sortBy('description')">
-            Description
+            Опис
             <i class="pi" [ngClass]="sortField === 'description' ? (sortOrder === 1 ? 'pi-sort-up' : 'pi-sort-down') : 'pi-sort'"></i>
           </th>
           <th style="width: 15%; cursor: pointer;" (click)="sortBy('dataType')">
-            Type
+            Тип
             <i class="pi" [ngClass]="sortField === 'dataType' ? (sortOrder === 1 ? 'pi-sort-up' : 'pi-sort-down') : 'pi-sort'"></i>
           </th>
-          <th style="width: 15%">Format</th>
-          <th style="width: 20%">Example</th>
-          <th style="width: 5%">Actions</th>
+          <th style="width: 15%">Формат</th>
+          <th style="width: 20%">Приклад</th>
+          <th style="width: 5%">Дії</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-property>
@@ -137,7 +137,7 @@
               [text]="true"
               [rounded]="true"
               size="small"
-              pTooltip="Delete property"
+              pTooltip="Видалити властивість"
               tooltipPosition="left">
             </p-button>
           </td>
@@ -147,10 +147,10 @@
         <tr>
           <td colspan="6" class="empty-state">
             <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-            <p>No schema properties defined</p>
+            <p>Нема визначених властивостей схеми</p>
             <p-button
               icon="pi pi-plus"
-              label="Add Your First Property"
+              label="Додайте вашу першу властивість"
               (onClick)="addProperty()"
               size="small">
             </p-button>
@@ -169,11 +169,11 @@
       styleClass="tree-table">
       <ng-template pTemplate="header">
         <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Type</th>
-          <th>Format</th>
-          <th>Example</th>
+          <th>Ім'я</th>
+          <th>Опис</th>
+          <th>Тип</th>
+          <th>Формат</th>
+          <th>Приклад</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
@@ -191,7 +191,7 @@
   <ng-template pTemplate="footer">
     <div class="card-footer-content">
       <div class="export-controls">
-        <span class="export-label">Export Schema:</span>
+        <span class="export-label">Експортувати схему:</span>
         <p-dropdown
           appendTo="body"
           [options]="exportFormats"
@@ -203,11 +203,11 @@
         </p-dropdown>
         <p-button
           icon="pi pi-download"
-          label="Export"
+          label="Експортувати"
           (onClick)="exportSchema()"
           severity="success"
           size="small"
-          pTooltip="Export schema to selected format"
+          pTooltip="Експортувати схему в обраний формат"
           tooltipPosition="bottom">
         </p-button>
       </div>
